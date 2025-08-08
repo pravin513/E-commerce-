@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You - DK Mega Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+      text-align: center;
+    }
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      max-width: 400px;
+      position: relative;
+    }
+    h1 {
+      color: #28a745;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #555;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 20px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="card">
+    <h1>🎉 Order Placed!</h1>
+    <p>Thank you for shopping with DK Mega Store.<br>Your order has been successfully placed.</p>
+    <button onclick="window.location.href='orders.html'">View My Orders</button>
+    <p style="margin-top:10px;font-size:12px;color:#888;">Redirecting in <span id="countdown">5</span> seconds...</p>
+  </div>
+
+  <script>
+    // Confetti effect
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confettiPieces = [];
+    for (let i = 0; i < 150; i++) {
+      confettiPieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 8 + 2,
+        h: Math.random() * 8 + 2,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        speed: Math.random() * 5 + 2
+      });
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettiPieces.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        p.y += p.speed;
+        if (p.y > canvas.height) {
+          p.y = -p.h;
+          p.x = Math.random() * canvas.width;
+        }
+      });
+      requestAnimationFrame(drawConfetti);
+    }
+    drawConfetti();
+
+    // Auto redirect countdown
+    let timeLeft = 5;
+    const countdownEl = document.getElementById('countdown');
+    const timer = setInterval(() => {
+      timeLeft--;
+      countdownEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        window.location.href = 'orders.html';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
