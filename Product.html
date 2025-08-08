@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Details - DK Mega Store</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+    header { background: #ff6600; padding: 15px; color: white; text-align: center; font-size: 20px; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .product-img { width: 100%; max-height: 300px; object-fit: contain; }
+    .title { font-size: 24px; font-weight: bold; margin-top: 15px; }
+    .price { font-size: 22px; color: #e91e63; margin-top: 10px; }
+    .desc { margin-top: 15px; color: #555; }
+    .stock { margin-top: 10px; font-weight: bold; }
+    .btn { display: inline-block; padding: 10px 20px; background: #ff6600; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+    .btn:hover { background: #e65c00; }
+</style>
+</head>
+<body>
+
+<header>🛒 DK Mega Store</header>
+
+<div class="container">
+    <img id="product-img" class="product-img" src="" alt="Product Image">
+    <div id="product-title" class="title"></div>
+    <div id="product-price" class="price"></div>
+    <div id="product-desc" class="desc"></div>
+    <div id="product-stock" class="stock"></div>
+    <button class="btn" id="add-to-cart">Add to Cart</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
+<script>
+  // 🔥 Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyB4Ga1n1tNDY4vtBiozqYo2_IraAGSFdE8",
+    authDomain: "dk-mega-store.firebaseapp.com",
+    projectId: "dk-mega-store",
+    storageBucket: "dk-mega-store.firebasestorage.app",
+    messagingSenderId: "309244990744",
+    appId: "1:309244990744:web:f4c9dbd446319aa1d83a6d"
+  };
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // 📌 URL से Product ID निकालना
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get("id");
+
+  if (!productId) {
+    alert("Product ID missing!");
+  } else {
+    loadProduct();
+  }
+
+  // 🛍 Product डेटा लोड करना
+  function loadProduct() {
+    db.collection("products").doc(productId).get().then(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        document.getElementById("product-img").src = data.image || "no-image.jpg";
+        document.getElementById("product-title").textContent = data.name;
+        document.getElementById("product-price").textContent = "₹" + data.price;
+        document.getElementById("product-desc").textContent = data.description;
+        document.getElementById("product-stock").textContent = data.stock > 0 ? "✅ In Stock" : "❌ Out of Stock";
+      } else {
+        alert("Product not found!");
+      }
+    }).catch(err => console.error(err));
+  }
+
+  // 🛒 Add to Cart Function
+  document.getElementById("add-to-cart").addEventListener("click", () => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please login first!");
+      return;
+    }
+
+    db.collection("cart").add({
+      userId: user.uid,
+      productId: productId,
+      quantity: 1
+    }).then(() => {
+      alert("✅ Added to Cart!");
+    }).catch(err => console.error(err));
+  });
+</script>
+
+</body>
+</html>
