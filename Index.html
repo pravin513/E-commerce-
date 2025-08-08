@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirana Ecosystem - Home</title>
+
+    <!-- CSS Embedded -->
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .navbar {
+            background: #0d6efd;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .banner {
+            width: 100%;
+            overflow: hidden;
+        }
+        .banner-slider img {
+            width: 100%;
+            display: block;
+        }
+        section {
+            padding: 15px;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        .category-grid, .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .category-grid div, .product-grid div {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .product-grid img {
+            max-height: 120px;
+            object-fit: contain;
+        }
+        footer {
+            background: #0d6efd;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        button {
+            background: #0d6efd;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>🛒 Kirana Ecosystem</h1>
+        <div>🔍</div>
+    </div>
+
+    <!-- Hero Banner -->
+    <section class="banner">
+        <div class="banner-slider">
+            <img src="https://via.placeholder.com/1200x400/0d6efd/fff?text=Big+Sale+50%25+Off" alt="Offer 1">
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories">
+        <h2>Shop by Category</h2>
+        <div class="category-grid" id="category-list">
+            <!-- Dynamic Categories -->
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="products">
+        <h2>Featured Products</h2>
+        <div class="product-grid" id="product-list">
+            <!-- Dynamic Products from Firebase -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2025 Kirana Ecosystem. All rights reserved.
+    </footer>
+
+    <!-- JS Embedded -->
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyB4Ga1n1tNDY4vtBiozqYo2_IraAGSFdE8",
+  authDomain: "dk-mega-store.firebaseapp.com",
+  databaseURL: "https://dk-mega-store-default-rtdb.firebaseio.com",
+  projectId: "dk-mega-store",
+  storageBucket: "dk-mega-store.firebasestorage.app",
+  messagingSenderId: "309244990744",
+  appId: "1:309244990744:web:f4c9dbd446319aa1d83a6d",
+  measurementId: "G-LB24N25YP9"
+};
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Load Categories
+        const categories = [
+            { name: "Fruits", img: "https://via.placeholder.com/150?text=Fruits" },
+            { name: "Vegetables", img: "https://via.placeholder.com/150?text=Vegetables" },
+            { name: "Snacks", img: "https://via.placeholder.com/150?text=Snacks" },
+            { name: "Dairy", img: "https://via.placeholder.com/150?text=Dairy" }
+        ];
+        const catList = document.getElementById('category-list');
+        categories.forEach(cat => {
+            catList.innerHTML += `
+                <div>
+                    <img src="${cat.img}" alt="${cat.name}" width="100%">
+                    <h4>${cat.name}</h4>
+                </div>
+            `;
+        });
+
+        // Load Products from Firebase
+        async function loadProducts() {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = "<p>Loading products...</p>";
+            try {
+                const snapshot = await db.collection("products").get();
+                productList.innerHTML = "";
+                snapshot.forEach(doc => {
+                    let p = doc.data();
+                    productList.innerHTML += `
+                        <div>
+                            <img src="${p.image}" alt="${p.name}" width="100%">
+                            <h4>${p.name}</h4>
+                            <p>₹${p.price}</p>
+                            <button>Add to Cart</button>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                productList.innerHTML = "<p>Error loading products</p>";
+                console.error(err);
+            }
+        }
+        loadProducts();
+    </script>
+</body>
+  </html>
